@@ -17,7 +17,7 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
 
     private Timer timer = null;
     private TimerTask task = null;
-    private long delay= 0, period= 60000;
+    private long delay= 0, period= 6000;
 
     private boolean singleFile = false;   // true: 输出到一个文件 文件名: name; false: 定时生成文件 文件名: name+报告生成时间
     private boolean appendWrite = true;
@@ -38,10 +38,10 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
         this.singleFile = singleFile;
         if ( singleFile )
         {
-            this.timer = new Timer(true);
+            this.timer = null;
         } else
         {
-            this.timer = null;
+            this.timer = new Timer(true);
         }
         return true;
     }
@@ -67,7 +67,8 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
             } else
             {
                 setTimerTask( performanceMap );
-                timer.schedule(task, delay, period);
+
+                timer.schedule( task, delay, period);
             }
             return true;
         }
@@ -111,7 +112,7 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
 
     public void endPerformanceOutput()
     {
-        timer.cancel();
+        task.cancel();
     }
 
     public void setDelay( long delay ) {
