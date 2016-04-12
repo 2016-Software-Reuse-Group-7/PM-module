@@ -1,23 +1,29 @@
 package TeamSeven.pm;
 
+
+import java.util.LinkedHashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by joshoy on 16/4/11.
  */
-public interface PerformanceLog {
+public interface PerformanceLog<K, V> {
+
     /**
-     * @param performanceIndexName: 添加的性能指标名称
+     * @param key: 添加的性能指标名称
      */
-    void addPerformanceItem(String performanceIndexName);
+    boolean addItem(K key, V value);
+    boolean deleteItem(K key);
 
     /**
      * @param val: 更新对应指标名称的当前性能记录
      */
-    void updatePerformanceValue(String performanceIndexName, String val);
-
+    boolean updatePerformanceValue(K key, V val);
 
     /**
-     * @param performanceIndexName: 获取记录的性能指标数值
+     * @param key: 获取记录的性能指标数值
      * @return
      */
-    String getPerformaceValue(String performanceIndexName);
+    V getPerformaceValue(K key);
 }

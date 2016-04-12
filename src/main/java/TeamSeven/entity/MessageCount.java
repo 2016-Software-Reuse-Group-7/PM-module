@@ -1,19 +1,18 @@
-package TeamSeven;
+package TeamSeven.entity;
 
 /**
  * Created by tina on 16/4/10.
  */
 public class MessageCount
 {
-
-    private String userName;
+    private boolean serverFlag;
     private int sendMessageCount;
     private int receivedMessageCount;
     private int ignoredMessageCount;
 
-    public MessageCount( String name )
+    public MessageCount( boolean serverFlag )
     {
-        userName = name;
+        this.serverFlag = serverFlag;
         sendMessageCount = 0;
         receivedMessageCount = 0;
         ignoredMessageCount = 0;
@@ -21,14 +20,14 @@ public class MessageCount
 
     public String toString()
     {
-        if( userName.equals("server") )
+        if( serverFlag )
         {
-            System.out.println( "系统广播消息"+ sendMessageCount +"条, 一共接收消息" + receivedMessageCount + "条, 忽略消息" + ignoredMessageCount + "条" );
-            return "系统广播消息"+ sendMessageCount +"条, 一共接收消息" + receivedMessageCount + "条, 忽略消息" + ignoredMessageCount + "条\n";
+            System.out.println( "一共接收消息" + receivedMessageCount + "条, 忽略消息" + ignoredMessageCount + "条" );
+            return "一共接收消息" + receivedMessageCount + "条, 忽略消息" + ignoredMessageCount + "条\n";
         }else
         {
-            System.out.println( userName + ": 共发送消息" + sendMessageCount + "条, 被接收消息" + receivedMessageCount + "条, 被忽略消息" + ignoredMessageCount + "条" );
-            return userName + ": 共发送消息" + sendMessageCount + "条, 被接收消息" + receivedMessageCount + "条, 被忽略消息" + ignoredMessageCount + "条\n";
+            System.out.println( "共发送消息" + sendMessageCount + "条, 被接收消息" + receivedMessageCount + "条, 被忽略消息" + ignoredMessageCount + "条" );
+            return "共发送消息" + sendMessageCount + "条, 被接收消息" + receivedMessageCount + "条, 被忽略消息" + ignoredMessageCount + "条\n";
         }
     }
 
