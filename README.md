@@ -126,7 +126,7 @@ public class MessageCount
 {
     private String userName;
     private int sendMessageCount;
-  y  private int receivedMessageCount;
+    private int receivedMessageCount;
     private int ignoredMessageCount;
     
     public MessageCount( String name )
