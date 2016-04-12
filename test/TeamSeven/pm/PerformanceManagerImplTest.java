@@ -28,23 +28,9 @@ public class PerformanceManagerImplTest
     }
 
     @Test
-    public void setOutputType1() throws Exception
-    {
-        assertEquals( true, pmManager.setOutputType( true, true ) );
-        assertEquals( false, pmManager.setOutputType( false, true ) );
-    }
-
-    @Test
-    public void setOutputType2() throws Exception
-    {
-        assertEquals( true, pmManager.setOutputType( false, 0, 60000 ) );
-        assertEquals( false, pmManager.setOutputType( false, true ) );
-    }
-
-    @Test
     public void outputPerformanceLog() throws Exception
     {
-        pmManager.setOutputType( true, true );
+        pmManager.setOutputType( true);
         pmManager.outputPerformanceLog( pmLog );
     }
 

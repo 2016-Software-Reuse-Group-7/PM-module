@@ -4,88 +4,142 @@
 - 每分钟自动生成性能报告（对每指标求和）
 - 性能报告输出到单独的性能文件，文件名包括性能报告时间
 
-###Pm
+###PM
+构件包含两个接口——PerformanceLog和PerformanceManager
+及它们的实现——PerformanceLogImpl和PerformanceManagerImpl
+
+####PerformanceLog / PerformanceLogImpl
+功能：性能指标记录工具
 #####构造方法：
-> Pm<K, V> pm = new Pm<K, V>( name );
-> Pm<K, V> pm = new Pm<K, V>( name, path );
-> Pm<K, V> pm = new Pm<K, V>( name, delay, period );
+```java
+PerformanceLogImpl<K, V> pLog = new PerformanceLogImpl<K, V>();
+PerformanceLogImpl<K, V> pLog2 = new PerformanceLogImpl<K, V>( key, value);
+```
+K为性能名称的数据类型，或者为能区别性能名称的标识的数据类型
+V为性能指数的数据类型
+K、V也可以用户自定义类，类要实现toString方法，自定义输出格式
 
-name 指性能名称，最后的文件输出会包含性能名称
-path 指性能报告的输出路径
-构件使用 Timer 和 TimerTask 来定时生成报告，构造时可以设置生成性能报告的 delay 和 period
-默认情况下 delay 为0，period 为60000
-
-性能指标可能还分不同用例，和各种细节指标，比如在实践项目中，对于消息统计还得分不同用户，消息统计还得分接收的消息和忽略的消息。
-K为能区别用例的变量的数据类型
-V为用户定义类，类中包含各种细节指标，一定要实现toString方法，自定义输出格式，也可以使用简单数据类型
+如果接收应用程序的性能名称和性能指数都是String类型
+```java
+PerformanceLogImpl<String, String> pm = new Pm<String, String>( name ); 
+```
+但是考虑到性能指数可能更复杂，同时为了增强可复用性，所以使用了泛型。
 
 #####方法：
-设置 name、path、delay 、 period 参数
-> Pm.setName( String name );
-> Pm.setPath( String path );
-> Pm.setDelay( long delay );
-> Pm.setPeriod( long period );
+1. 添加一个性能指标
+```java
+boolean addItem(K key, V value);
+```
+2. 删除一个性能指标
+```java
+boolean deleteItem(K key);
+```
+3. 获得该性能指标的指数
+```java
+V getPerformaceValue(K key);
+```
 
-开始生成报告
-> Pm.startOutput();
+4. 更新某性能指标的指数
+```java
+boolean updatePerformanceValue(K key, V val);
+```
 
-结束生成报告
-> Pm.endOutput();
 
-添加一个用例
-> Pm.addInstance( K instanceKey );
+####PerformanceManager / PerformanceManagerImpl
+功能：输出工具，生成性能文件
+#####构造方法
+```java
+PerformanceManagerImpl pManager = new PerformanceManagerImpl( fileName );
+PerformanceManagerImpl pManager2 = new PerformanceManagerImpl( fileName, filePath );
+```
+String fileName：文件名
+String filePath：输出文件位置
 
-删除一个用例
-> Pm.deleteInstance( K instanceKey );
+#####方法
+1. 设置输出方式：
+- singleFile为true：只输出单次 
+- singleFile为false：定时输出
+```java
+public boolean setOutputType( boolean singleFile );
+```
+2. 设置参数
+```java   
+void setAppendWrite(boolean appendWrite);
+void setDelay( long delay );
+void setPeriod( long period );
+void setName(String name);
+void setPath(String path);
+```
+appendWrite：当输出到已存在的文件时，是否追加到原文件内，默认为true
+delay：当采用定时输出时，延迟delay毫秒后开始生成文件，默认为0
+period：当采用定时输出时，每period毫秒生成一个文件，默认为600000毫秒
 
-获得该用例的性能指数
-> Pm.getParameters( K instanceKey );
+3. 输出
+根据传入的PerformanceLogImpl类型数据和设置好的参数生成性能文件
+```java
+boolean outputPerformanceLog( PerformanceLogImpl<K, V> performancelog ) throws IOException;
+```
 
-更新某用例的性能指数
-> Pm.setParameters( K instanceKey, V instanceValues );
+4. 停止输出
+如果选择定时输出，可以使用以下方法停止
+```java
+void endPerformanceOutput();
+```
 
 ###单元测试
-PmTest.java
-| 测试功能              |    测试结果   |
-| :------------------          | :----------- |
-| 获得某用例的性能指数（用例存在）  | 通过 |
-| 获得某用例的性能指数（用例不存在） | 通过  |
-| 设置某用例的性能指数（用例存在） | 通过  |
-| 设置某用例的性能指数（用例不存在）| 通过  |
-| 设置某用例的性能指数（用例存在）| 通过  |
-| 添加新用例（用例不存在）| 通过  |
-| 添加新用例（用例存在）| 通过  |
-| 删除用例（用例不存在）| 通过 |
-| 删除用例（用例存在）| 通过 |
-| 开始输出性能报告（路径缺失情况下）| 通过 |
+
+PerformanceLogImplTest.java
+| 测试功能  | 预期结果　|   测试结果   |
+| :---|:---| :---: |
+| 获得某性能的指数（性能指标存在）|返回true| 通过 |
+| 获得某性能的指数（性能指标不存在） |返回false| 通过  |
+| 设置某性能的指数（性能指标存在） |返回true| 通过  |
+| 设置某性能的指数（性能指标不存在）|返回false| 通过  |
+| 添加新性能指数（性能指标不存在）|返回true| 通过  |
+| 添加新性能指数（性能指标存在）|返回false| 通过  |
+| 删除性能指标（性能指标不存在）|返回false| 通过 |
+| 删除性能指标（性能指标存在）|返回true| 通过 |
+| 计算共有几个性能指标 |返回个数| 通过 |
+
+PerformanceManagerImplTest.java
+| 测试功能  | 预期结果　|   测试结果   |
+| :---|:---| :---: |
+| 设置输出类型|返回true| 通过 |
+| 设置输出单个文件（参数类型正确）|返回true| 通过 |
+| 设置输出单个文件（参数类型不正确）|返回false| 通过 |
+| 设置定时输出（参数类型正确）|返回true| 通过 |
+| 设置定时输出（参数类型不正确）|返回false| 通过 |
+| 单个文件输出|生成文件并写入| 通过 |
+
+
 
 
 ###MessageCount
-基于实践项目，可以用 id 或者用户名来识别用户端，所以 K 可以使用 Int 或是 String ，另外又构造了 MessageCount 类。
+在实践项目中，在定时log服务端和客户端所接受／忽略的消息数时，可以调用Pm构件。
+可以用 id 或者用户名来识别用户端，另外构造了 MessageCount 类来记录各详细指标。
 
 ```
-public class MessageCount
+public class MessageCount 
 {
-
     private String userName;
     private int sendMessageCount;
-    private int receivedMessageCount;
+  y  private int receivedMessageCount;
     private int ignoredMessageCount;
-
-	public MessageCount( String name )
+    
+    public MessageCount( String name )
     {
         userName = name;
         sendMessageCount = 0;
         receivedMessageCount = 0;
         ignoredMessageCount = 0;
     }
-
     public String toString();
     public void addSendMessageCount(int number);
     public void addReceivedMessageCount(int number);
     public void addIgnoredMessageCount(int number);
-
 }
 
 ```
+
+
 

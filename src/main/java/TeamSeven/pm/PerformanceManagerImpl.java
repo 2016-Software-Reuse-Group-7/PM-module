@@ -45,29 +45,6 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
         }
         return true;
     }
-    public boolean setOutputType( boolean singleFile, boolean appendWrite )
-    {
-        if ( singleFile == true )
-        {
-            this.singleFile = singleFile;
-            this.appendWrite = appendWrite;
-            this.timer = null;
-            return true;
-        }
-        return false;
-    }
-    public boolean setOutputType( boolean singleFile, long delay, long period )
-    {
-        if ( singleFile == false )
-        {
-            this.singleFile = singleFile;
-            this.delay = delay;
-            this.period = period;
-            this.timer = new Timer(true);
-            return true;
-        }
-        return false;
-    }
 
     public boolean outputPerformanceLog( PerformanceLogImpl<K, V> performancelog ) throws IOException {
         final LinkedHashMap<K, V> performanceMap = performancelog.getPerformanceMap();
@@ -97,7 +74,7 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
         return false;
     }
 
-    public void setTimerTask( final LinkedHashMap<K, V> performanceMap )
+    private void setTimerTask( final LinkedHashMap<K, V> performanceMap )
     {
         this.task = new TimerTask() {
             @Override
@@ -118,7 +95,7 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
         };
     }
 
-    public void output( String filePath, LinkedHashMap<K, V> performanceMap ) throws IOException
+    private void output( String filePath, LinkedHashMap<K, V> performanceMap ) throws IOException
     {
 
         FileWriter writer = new FileWriter( filePath, appendWrite );
@@ -151,6 +128,14 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setAppendWrite(boolean appendWrite) {
+        this.appendWrite = appendWrite;
+    }
+
+    public void setSingleFile(boolean singleFile) {
+        this.singleFile = singleFile;
     }
 
     public String getPath() {
