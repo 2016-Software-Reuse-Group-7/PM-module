@@ -52,17 +52,16 @@ boolean updatePerformanceValue(K key, V val);
 PerformanceManagerImpl pManager = new PerformanceManagerImpl( fileName );
 PerformanceManagerImpl pManager2 = new PerformanceManagerImpl( fileName, filePath );
 ```
-String fileName：文件名  
-String filePath：输出文件位置  
+fileName：文件名; filePath：输出文件位置  
 
 #####方法
-1.设置输出方式：
+1.设置输出方式     
 - singleFile为true：只输出单次 
 - singleFile为false：定时输出
 ```java
 public boolean setOutputType( boolean singleFile );
 ```
-2.设置参数
+2.设置参数  
 ```java   
 void setAppendWrite(boolean appendWrite);
 void setDelay( long delay );
@@ -74,21 +73,21 @@ appendWrite：当输出到已存在的文件时，是否追加到原文件内，
 delay：当采用定时输出时，延迟delay毫秒后开始生成文件，默认为0  
 period：当采用定时输出时，每period毫秒生成一个文件，默认为600000毫秒  
 
-3.输出
+3.输出  
 根据传入的PerformanceLogImpl类型数据和设置好的参数生成性能文件
 ```java
 boolean outputPerformanceLog( PerformanceLogImpl<K, V> performancelog ) throws IOException;
 ```
 
-4.停止输出
+4.停止输出  
 如果选择定时输出，可以使用以下方法停止
 ```java
 void endPerformanceOutput();
 ```
 
 ###单元测试
-测试对象：PerformanceLogImpl.java
-测试代码：PerformanceLogImplTest.java
+测试对象：PerformanceLogImpl.java  
+测试代码：PerformanceLogImplTest.java  
 测试结果：
 
 编号 | 测试功能 | 预期结果 | 测试结果 |
@@ -104,9 +103,9 @@ void endPerformanceOutput();
 9 | 计算共有几个性能指标 | 返回个数 | 正确 |
 
 
-测试对象：PerformanceManagerImpl.java
-测试代码：PerformanceManagerImplTest.java
-测试结果：
+测试对象：PerformanceManagerImpl.java  
+测试代码：PerformanceManagerImplTest.java  
+测试结果：  
 
 编号 | 测试功能 | 预期结果 | 测试结果 |
 --- | --- | --- | --- |
