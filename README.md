@@ -11,7 +11,7 @@ jar包位置: classes/artifacts/course_teamwork_1_jar
 构件内部使用数据类型为PerformanceLogImpl（自定义接口实现）的成员变量pmlog来存储性能指标（性能名称、性能指数）    
 但是考虑到性能指数的数据类型可能会复杂，同时为了增强可复用性，所以使用了泛型    
 
-#####构造方法
+####构造方法
 
 ```java
 PerformanceManagerImpl<K, V> pManager = new PerformanceManagerImpl<K, V>( fileName );
@@ -56,7 +56,7 @@ boolean updatePerformanceValue(K key, V val);
 
 
 
-#####方法
+####方法
 
 1.设置输出方式：
 
