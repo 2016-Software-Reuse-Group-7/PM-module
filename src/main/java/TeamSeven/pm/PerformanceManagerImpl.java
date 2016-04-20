@@ -22,15 +22,19 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
     private boolean singleFile = false;   // true: 输出到一个文件 文件名: name; false: 定时生成文件 文件名: name+报告生成时间
     private boolean appendWrite = true;
 
+    public PerformanceLogImpl<K, V> pmlog;
+
     public PerformanceManagerImpl( String name )
     {
         this.name = name;
+        this.pmlog = new PerformanceLogImpl<K, V>();
     }
 
     public PerformanceManagerImpl( String name, String path )
     {
         this.name = name;
         this.path = path;
+        this.pmlog = new PerformanceLogImpl<K, V>();
     }
 
     public boolean setOutputType( boolean singleFile )
