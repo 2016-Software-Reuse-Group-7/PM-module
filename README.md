@@ -5,7 +5,7 @@
 - 性能报告输出到单独的性能文件，文件名包括性能报告时间
 
 ###PM
-生成的jar包: course_teamwork_1.jar
+生成的jar包: course_teamwork_1.jar     
 构件能满足上述需求    
 
 构件内部使用数据类型为PerformanceLogImpl（自定义接口实现）的成员变量pmlog来存储性能指标（性能名称、性能指数）    
