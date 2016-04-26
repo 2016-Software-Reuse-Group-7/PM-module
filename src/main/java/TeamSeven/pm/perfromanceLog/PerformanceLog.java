@@ -1,4 +1,4 @@
-package TeamSeven.pm;
+package TeamSeven.pm.perfromanceLog;
 
 
 import java.util.LinkedHashMap;

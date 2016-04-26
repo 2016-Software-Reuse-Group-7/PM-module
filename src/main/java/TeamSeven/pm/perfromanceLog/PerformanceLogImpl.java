@@ -1,4 +1,4 @@
-package TeamSeven.pm;
+package TeamSeven.pm.perfromanceLog;
 
 import java.util.LinkedHashMap;
 
@@ -9,9 +9,17 @@ public class PerformanceLogImpl<K, V> implements PerformanceLog<K, V> {
 
     private LinkedHashMap<K, V> performanceMap = null;
 
-    public PerformanceLogImpl()
+    public String logFileName;
+    public String logFilePath = "logfiles/performanceLog";
+    public boolean singleFile = false;   // true: 输出到一个文件 文件名: logFilePath/logFileName.txt; false: 定时生成文件 文件: logFilePath/logFileName/报告生成时间.txt
+    public boolean appendWrite = true;
+    public long delay= 0, period= 60000;
+
+
+    public PerformanceLogImpl( String fileName )
     {
         performanceMap = new LinkedHashMap<K, V>();
+        this.logFileName = fileName;
     }
     public PerformanceLogImpl( K key, V value )
     {

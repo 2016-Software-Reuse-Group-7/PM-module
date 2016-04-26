@@ -1,9 +1,8 @@
-package TeamSeven.pm;
+package TeamSeven.pm.performanceLog;
 
+import TeamSeven.pm.perfromanceLog.PerformanceLogImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.IncludeCategories;
-import org.omg.PortableInterceptor.Interceptor;
 
 import static org.junit.Assert.*;
 

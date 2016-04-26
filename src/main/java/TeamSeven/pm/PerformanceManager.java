@@ -1,33 +1,19 @@
 package TeamSeven.pm;
 
+import TeamSeven.pm.perfromanceLog.PerformanceLogImpl;
+
 import java.io.IOException;
-import java.util.LinkedHashMap;
 
 /**
  * Created by joshoy on 16/4/11.
  */
-public interface PerformanceManager<K, V> {
-
-
-    boolean setOutputType( boolean singleFile );
-
-    boolean outputPerformanceLog( PerformanceLogImpl<K, V> performancelog ) throws IOException;
-
+public interface PerformanceManager<K, V>
+{
+    boolean outputPerformanceLog() throws IOException;
     void endPerformanceOutput();
 
-    void setDelay( long delay );
+    boolean recordLog( String fileName, String content, boolean append ) throws IOException;
 
-    void setPeriod( long period );
-
-    String getName();
-
-    void setName(String name);
-
-    String getPath();
-
-    void setPath(String path);
-
-    void setAppendWrite(boolean appendWrite);
 
 }
 
