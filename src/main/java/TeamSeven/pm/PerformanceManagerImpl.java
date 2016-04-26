@@ -1,5 +1,9 @@
 package TeamSeven.pm;
 
+import TeamSeven.pm.perfromanceLog.PerformanceLogImpl;
+import TeamSeven.pm.recordLog.RecordLog;
+import TeamSeven.pm.zip.ZipManager;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,52 +14,29 @@ import java.util.*;
 /**
  * Created by joshoy on 16/4/11.
  */
-public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
+public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V>
+{
+    private ZipManager zipManager;
+    private RecordLog recordLog;
+    public PerformanceLogImpl<K, V> pmLog;
 
-    private String name;
-    private String path = null;
+    public PerformanceManagerImpl( String fileName )
+    {
+        this.zipManager = new ZipManager( fileName );
+        this.recordLog = new RecordLog();
+        this.pmLog = new PerformanceLogImpl<K, V>( fileName );
+    }
 
-    private Timer timer = null;
+
+    // Performance Log
+    // 设置定时输出并开始
+    private Timer timer = new Timer(true);
     private TimerTask task = null;
-    private long delay= 0, period= 6000;
-
-    private boolean singleFile = false;   // true: 输出到一个文件 文件名: name; false: 定时生成文件 文件名: name+报告生成时间
-    private boolean appendWrite = true;
-
-    public PerformanceLogImpl<K, V> pmlog;
-
-    public PerformanceManagerImpl( String name )
+    public boolean outputPerformanceLog() throws IOException
     {
-        this.name = name;
-        this.pmlog = new PerformanceLogImpl<K, V>();
-    }
-
-    public PerformanceManagerImpl( String name, String path )
-    {
-        this.name = name;
-        this.path = path;
-        this.pmlog = new PerformanceLogImpl<K, V>();
-    }
-
-    public boolean setOutputType( boolean singleFile )
-    {
-        this.singleFile = singleFile;
-        if ( singleFile )
+        if ( pmLog.logFilePath != null )
         {
-            this.timer = null;
-        } else
-        {
-            this.timer = new Timer(true);
-        }
-        return true;
-    }
-
-    public boolean outputPerformanceLog( PerformanceLogImpl<K, V> performancelog ) throws IOException {
-        final LinkedHashMap<K, V> performanceMap = performancelog.getPerformanceMap();
-        if ( path != null )
-        {
-
-            File file = new File( path );
+            File file = new File( pmLog.logFilePath );
 
             if( !file.exists() || !file.isDirectory() ) {
                 if(!file.mkdirs()) {
@@ -63,34 +44,38 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
                     return false;
                 }
             }
-            if ( singleFile )
+            if ( pmLog.singleFile )
             {
-                String filePath = path + "/" + name + ".txt";
-                output( filePath, performanceMap );
+                String filePath = pmLog.logFilePath + "/" + pmLog.logFileName + ".txt";
+                output( filePath, pmLog.getPerformanceMap() );
 
             } else
             {
-                setTimerTask( performanceMap );
-
-                timer.schedule( task, delay, period);
+                file = new File( pmLog.logFilePath + "/" + pmLog.logFileName );
+                if( !file.exists() || !file.isDirectory() ) {
+                    if(!file.mkdirs()) {
+                        System.out.println("创建目标文件所在目录失败！");
+                        return false;
+                    }
+                }
+                setTimerTask( pmLog.getPerformanceMap() );
+                timer.schedule( task, pmLog.delay, pmLog.period );
             }
             return true;
         }
         return false;
     }
-
     private void setTimerTask( final LinkedHashMap<K, V> performanceMap )
     {
         this.task = new TimerTask() {
             @Override
             public void run() {
                 Date dt = new Date();
-                DateFormat df = new SimpleDateFormat( "yyyyMMdd_HH:mm:ss" );
+                DateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss" );
                 String time = df.format( dt );
                 try {
-
-                    String filePath = path + "/" + name + "_" + time + ".txt";
-                    output( filePath, performanceMap );
+                    String filePath = pmLog.logFilePath + "/" + pmLog.logFileName + "/" + time + ".txt";
+                    performanceLog( filePath, performanceMap );
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -99,56 +84,124 @@ public class PerformanceManagerImpl<K, V> implements PerformanceManager<K, V> {
             }
         };
     }
-
-    private void output( String filePath, LinkedHashMap<K, V> performanceMap ) throws IOException
+    private boolean performanceLog( String filePath, LinkedHashMap<K, V> performanceMap ) throws IOException
     {
-
-        FileWriter writer = new FileWriter( filePath, appendWrite );
-
-        for ( Map.Entry<K, V> entry : performanceMap.entrySet() )
+        String result = output( filePath, performanceMap );
+        if ( result == null )
         {
-            writer.write( entry.getKey().toString() + ":  " + entry.getValue().toString() );
-            //System.out.println( entry.getKey().toString() + ":  " + entry.getValue().toString() );
+            return false;
+        } else
+        {
+            zipManager.addFileList( result );
+            return true;
         }
-        writer.close();
 
     }
+    private String output( String filePath, LinkedHashMap<K, V> performanceMap ) throws IOException
+    {
+        File file = new File( filePath );
+        if( file.exists() || file.createNewFile() )
+        {
+            FileWriter writer = new FileWriter( filePath, pmLog.appendWrite );
 
+            for ( Map.Entry<K, V> entry : performanceMap.entrySet() )
+            {
+                writer.write( entry.getKey().toString() + ":  " + entry.getValue().toString() );
+            }
+            writer.close();
+            return filePath;
+
+        } else
+        {
+            System.out.println( filePath + ": 记录失败" );
+            return null;
+        }
+    }
+    // 停止定时输出
     public void endPerformanceOutput()
     {
         task.cancel();
     }
 
-    public void setDelay( long delay ) {
-        this.delay = delay;
+    // 设置performanceLog
+    public void setLogDelay( long delay ) {
+        this.pmLog.delay = delay;
+    }
+    public void setLogPeriod( long period ) {
+        this.pmLog.period = period;
+    }
+    public void setLogFileName(String logFileName) {
+        this.pmLog.logFileName = logFileName;
+    }
+    public void setLogAppendWrite( boolean appendWrite ) {
+        this.pmLog.appendWrite = appendWrite;
+    }
+    public void setLogSingleFile( boolean singleFile ) {
+        if ( singleFile )
+        {
+            this.timer = null;
+        } else
+        {
+            this.timer = new Timer(true);
+        }
+        this.pmLog.singleFile = singleFile;
+    }
+    public void setLogFilePath(String logFilePath) {
+        this.pmLog.logFilePath = logFilePath;
+    }
+    public String getLogFilePath() {
+        return pmLog.logFilePath;
     }
 
-    public void setPeriod( long period ) {
-        this.period = period;
+
+    // Record Log
+    // 输出传入的content
+    public boolean recordLog( String fileName, String content, boolean append ) throws IOException
+    {
+        String result = recordLog.record( fileName, content, append );
+        if ( result == null )
+        {
+            return false;
+        } else
+        {
+            zipManager.addFileList( result );
+            return true;
+        }
     }
 
-    public String getName() {
-        return name;
+    //设置recordLog
+    public void setRecordFilePath( String recordFilePath )
+    {
+        this.recordLog.setRecordFilePath( recordFilePath );
     }
 
-    public void setName(String name) {
-        this.name = name;
+
+    // Zip Manager
+    public void disableZip()
+    {
+        this.zipManager.disableTimer();
+    }
+    public void ableZip()
+    {
+        this.zipManager.setTimer();
+    }
+    public void doOneZip() throws Exception
+    {
+        this.zipManager.zipFile();
+    }
+    // 设置zipManager
+    public void setZipFilePath( String zipFilePath )
+    {
+        this.zipManager.setZipFileDes( zipFilePath );
+    }
+    public void setZipTime( Date time )
+    {
+        this.zipManager.setTimerDelay( time );
+    }
+    public void setZipInterval( long interval )
+    {
+        this.zipManager.setTimerPeriod( interval );
     }
 
-    public void setAppendWrite(boolean appendWrite) {
-        this.appendWrite = appendWrite;
-    }
-
-    public void setSingleFile(boolean singleFile) {
-        this.singleFile = singleFile;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 
 }

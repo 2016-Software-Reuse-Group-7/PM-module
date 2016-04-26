@@ -11,27 +11,51 @@ import static org.junit.Assert.*;
 public class PerformanceManagerImplTest
 {
 
-    PerformanceLogImpl<String, Integer> pmLog;
     PerformanceManagerImpl<String, Integer> pmManager;
 
     @Before
     public void setUp() throws Exception
     {
-        pmLog = new PerformanceLogImpl<String, Integer>( "testItem", 1 );
-        pmManager = new PerformanceManagerImpl<String, Integer>( "test", "log" );
-    }
-
-    @Test
-    public void setOutputType() throws Exception
-    {
-        assertEquals( true, pmManager.setOutputType( true ) );
+        pmManager = new PerformanceManagerImpl<String, Integer>( "test" );
     }
 
     @Test
     public void outputPerformanceLog() throws Exception
     {
-        pmManager.setOutputType( true);
-        pmManager.outputPerformanceLog( pmLog );
+        pmManager.pmLog.addItem( "test1", 1 );
+        pmManager.pmLog.addItem( "test2", 2 );
+        pmManager.pmLog.addItem( "test3", 3 );
+        pmManager.outputPerformanceLog();
+
+//        while( true )
+//        {
+//
+//        }
+    }
+
+    @Test
+    public void outputRecordLog() throws Exception
+    {
+        pmManager.recordLog( "recordTest", "testing...", true);
+        pmManager.recordLog( "recordTest", "testing...", true);
+
+        pmManager.setRecordFilePath( "logFiles/dic/records");
+        pmManager.recordLog( "recordTest", "testing...", true);
+
+    }
+
+    @Test
+    public void zipManagerTest() throws Exception
+    {
+        pmManager.pmLog.addItem( "test1", 1 );
+        pmManager.pmLog.addItem( "test2", 2 );
+        pmManager.pmLog.addItem( "test3", 3 );
+        pmManager.outputPerformanceLog();
+        pmManager.recordLog( "recordTest", "testing...", true);
+        pmManager.recordLog( "recordTest", "testing...", true);
+
+        pmManager.doOneZip();
+
     }
 
 }
