@@ -126,7 +126,7 @@ pManager.ableZip();
 
 ##单元测试   
 
-测试代码：PerformanceLogImplTest.java   
+测试代码：PerformanceLogImplTest.java     
 测试结果：   
 
 | 测试功能 | 预期结果 | 测试结果 |
@@ -142,7 +142,7 @@ pManager.ableZip();
 | 计算共有几个性能指标 | 返回个数 | 正确 |
 
 
-测试代码：zipManagerTest.java
+测试代码：zipManagerTest.java   
 测试结果：
 
 | 测试功能  | 预期结果　|   测试结果   |
@@ -151,7 +151,7 @@ pManager.ableZip();
 | 更改打包路径 |路径更新| 通过 |
 
 
-测试代码：recordLogTest.java
+测试代码：recordLogTest.java   
 测试结果：
 
 | 测试功能  | 预期结果　|   测试结果   |
@@ -159,7 +159,7 @@ pManager.ableZip();
 | 写入文件|写入成功且路径正确| 通过 |
 
 
-测试代码：PerformanceManagerImplTest.java
+测试代码：PerformanceManagerImplTest.java   
 测试结果：
 
 | 测试功能  | 预期结果　|   测试结果   |
